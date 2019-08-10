@@ -1,18 +1,21 @@
 import * as React from 'react';
+import { Link } from 'react-router-dom'
 
-function Categories({ list }){
+function Categories({ list, handleClick }){
     let copy = [
         {
-            id: 'all',
-            name: 'Todos'
+            id: null,
+            name: 'Todos',
+            handleClick: handleClick
         },
         ...list
     ];
     return <nav>
-        {copy.map(({ id, name }) => 
-            <a href="/" className="btn btn-default" key={id}>
+        {copy.map(({ id, name }) =>
+            <Link className="btn btn-default" key={id} 
+                to={id ? '/categoria/' + id : '/'}>
                 {name}
-            </a>
+            </Link>
         )}
     </nav>;
 }

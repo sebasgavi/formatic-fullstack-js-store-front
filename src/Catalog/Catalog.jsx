@@ -8,12 +8,14 @@ class Catalog extends React.Component {
   constructor(props){
     super(props);
 
+    console.log(this.props.match)
+
     this.state = {
       products: [],
       categories: [],
     };
 
-    api.getProducts()
+    api.getProducts(this.props.match.params.catId)
       .then(res => {
         this.setState({
           products: res.body
@@ -39,13 +41,26 @@ class Catalog extends React.Component {
         });
       });
   }
+
+  shouldComponentUpdate(nextProps){
+    if(this.props.match.params.catId !== nextProps.match.params.catId){
+      api.getProducts(nextProps.match.params.catId)
+        .then(res => {
+          this.setState({
+            products: res.body
+          });
+        });
+    }
+
+    return true;
+  }
   
   render(){
     return <div className="container mt-4">
 
       {this.props.children}
 
-      <Categories list={this.state.categories} />
+      <Categories list={this.state.categories} handleClick={this.handleCategoryClick} />
 
       <input type="text" className="form-control mb-4" 
         placeholder="Buscar productos..." 
