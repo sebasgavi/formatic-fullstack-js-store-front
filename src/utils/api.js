@@ -1,7 +1,15 @@
 import request from 'superagent';
 import { serverBase } from '../config.json';
 
+var _jwt = null;
+var user = {};
+
 function getProducts(catId, price){
+    if(catId) {
+        let [id] = catId.split('-');
+        return getCategories(id);
+    }
+
     let filters = [];
 
     if(catId) filters.push('category._id='+catId);
@@ -19,15 +27,69 @@ function getSearchProducts(searchString){
         .get(`${serverBase}/products?name_contains=${searchString}`);
 }
 
-function getCategories(){
+function getProductById(productId){
+    let [id] = productId.split('-');
     return request
-        .get(serverBase + '/categories');
+        .get(`${serverBase}/products/${id}`);
+}
+
+function getCategories(catId){
+    let filter = catId ? '/' + catId : '';
+    return request
+        .get(serverBase + '/categories' + filter);
+}
+
+function postOrder(order){
+    return request
+        .post(serverBase + '/orders', order)
+        .set('Authorization', `Bearer ${_jwt}`);
+}
+
+function register(username, email, password){
+    return request.post(serverBase + '/auth/local/register', {
+            username: username,
+            email: email,
+            password: password
+        })
+        .then(res => {
+            if(res.body){
+                _jwt = res.body.jwt;
+                Object.keys(res.body.user)
+                    .forEach(key => {
+                        user[key] = res.body.user[key];
+                    });
+            }
+            return res;
+        });
+}
+
+
+function login(email, password){
+    return request.post(serverBase + '/auth/local', {
+            identifier: email,
+            password: password
+        })
+        .then(res => {
+            if(res.body){
+                _jwt = res.body.jwt;
+                Object.keys(res.body.user)
+                    .forEach(key => {
+                        user[key] = res.body.user[key];
+                    });
+            }
+            return res;
+        });
 }
 
 const api = {
     getProducts,
     getSearchProducts,
+    getProductById,
     getCategories,
+    register,
+    login,
+    user,
+    postOrder,
 };
 
 export default api;

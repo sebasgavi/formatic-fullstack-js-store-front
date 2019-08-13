@@ -1,3 +1,4 @@
 {
-    "serverBase": "http://172.18.1.51:1337"
+    "urlBase": "/formatic-fullstack-js-store-front-build",
+    "serverBase": "http://local.sgaviria.com"
 }

@@ -13,7 +13,7 @@ function Categories({ list, handleClick }){
     return <nav>
         {copy.map(({ id, name }) =>
             <Link className="btn btn-default" key={id} 
-                to={id ? '/categoria/' + id : '/'}>
+                to={id ? `/categoria/${id}-${name}` : '/'}>
                 {name}
             </Link>
         )}

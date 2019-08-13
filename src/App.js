@@ -1,25 +1,56 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ProductCard from './ProductCard/ProductCard';
 import Catalog from './Catalog/Catalog';
-import { BrowserRouter as Router, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Route, Link } from 'react-router-dom'
+import ProductDetails from './ProductDetails/ProductDetails';
+import { urlBase } from './config.json';
+import Register from './Register/Register';
+import api from './utils/api';
+import Login from './Login/Login';
+import Cart from './Cart/Cart';
+import Checkout from './Checkout/Checkout';
 
 function App() {
+
+  const [cartList, setCartList] = useState([]);
+
   return (
-    <Router>
+    <Router basename={urlBase}>
       <div className="App">
-        <header className="App-header">
 
-          <Route path={['/', '/categoria/:catId']} exact 
-            component={Catalog} />
+      <Route path="/" render={({ location, history }) => {
+          return api.user.username ? 
+            <p>Hola <strong>{api.user.username}</strong></p> :
+            <nav>
+          <Link to="?register">
+            Regístrate
+          </Link>
+          <Link to="?login">
+            Inicia sesión
+          </Link>
+        </nav>
+        }} />
 
-          {/*<Catalog>
-            <div className="alert alert-success">
-              <img src="" alt=""/>
-              Lorem ipsum dolor sit amet consectetur.
-              <a href="/hjkl">Compra ya!!!</a>
-            </div>
-          </Catalog>*/}
-        </header>
+        <Cart list={cartList} setList={setCartList} />
+        
+
+        <Route path={['/', '/categoria/:catId', '/producto/:productId']} exact 
+          render={({ match }) => <Catalog setCartList={setCartList} match={match} />} />
+
+        <Route path="/producto/:productId" component={ProductDetails} />
+
+        <Route path="/checkout" render={() => 
+          <Checkout cartList={cartList} />} />
+
+        <Route path="/" render={({ location, history }) => {
+          if(/register/.test(location.search)){
+            return <Register location={location} history={history} />;
+          } else if(/login/.test(location.search)) {
+            return <Login location={location} history={history} />;
+          } else {
+            return null;
+          }
+        }} />
       </div>
     </Router>
   );

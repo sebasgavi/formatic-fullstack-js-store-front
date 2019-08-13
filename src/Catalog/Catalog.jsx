@@ -18,7 +18,7 @@ class Catalog extends React.Component {
     api.getProducts(this.props.match.params.catId)
       .then(res => {
         this.setState({
-          products: res.body
+          products: res.body.products || res.body
         });
       });
 
@@ -43,13 +43,14 @@ class Catalog extends React.Component {
   }
 
   shouldComponentUpdate(nextProps){
-    if(this.props.match.params.catId !== nextProps.match.params.catId){
-      api.getProducts(nextProps.match.params.catId)
-        .then(res => {
-          this.setState({
-            products: res.body
+    let catId = nextProps.match.params.catId;
+    if(this.props.match.params.catId !== catId){
+      api.getProducts(catId)
+          .then(res => {
+            this.setState({
+              products: res.body.products || res.body
+            });
           });
-        });
     }
 
     return true;
@@ -69,7 +70,8 @@ class Catalog extends React.Component {
       <div className="row">
         {this.state.products.map(({ id, name, price, images }) => {
           return <div className="col-4" key={id}>
-            <ProductCard name={name} price={price} images={images} />
+            <ProductCard id={id} name={name} price={price} images={images}
+                setCartList={this.props.setCartList} />
           </div>;
         })}
       </div>
